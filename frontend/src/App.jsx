@@ -1,41 +1,101 @@
 import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
+  const [boards, setBoards] = useState([]);
+  const [selectedBoard, setSelectedBoard] = useState("");
   const [metrics, setMetrics] = useState(null);
+  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
-  fetch("http://127.0.0.1:3001/metrics/69a23f0f8d2c05d0780c6639")    .then(res => {
-      console.log("STATUS:", res.status);
-      return res.json();
-    })
-    .then(data => {
-      console.log("DATA:", data);
-      setMetrics(data);
-    })
-    .catch(err => {
-      console.error("ERRO REAL:", err);
-    });
-}, []);
+    fetch("http://localhost:3001/api/boards")
+      .then(res => res.json())
+      .then(data => setBoards(data))
+      .catch(err => console.error("Erro ao buscar boards:", err));
+  }, []);
 
-  if (!metrics) {
-    return <h2>Carregando...</h2>;
-  }
+
+  useEffect(() => {
+    if (!selectedBoard) return;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoading(false);
+
+    fetch(`http://localhost:3001/api/metrics/${selectedBoard}`)
+      .then(res => res.json())
+      .then(data => {
+        setMetrics(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Erro ao buscar métricas:", err);
+        setLoading(false);
+      });
+  }, [selectedBoard]);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Scrum Analytics</h1>
+    <div className="container">
+      <h1>Dashboard</h1>
 
-      <p>Total: {metrics.total}</p>
-      <p>Backlog: {metrics.backlog}</p>
-      <p>Em andamento: {metrics.emAndamento}</p>
-      <p>Concluídas: {metrics.concluidas}</p>
-      <p>Produtividade: {metrics.produtividade}</p>
+      <select
+        value={selectedBoard}
+        onChange={(e) => setSelectedBoard(e.target.value)}
+        className="select"
+      >
+        <option value="">Selecione um board</option>
+        {boards.map(board => (
+          <option key={board.id} value={board.id}>
+            {board.name}
+          </option>
+        ))}
+      </select>
 
-      <h3>Insight:</h3>
-      <p>{metrics.insight}</p>
+      {loading ? (
+        <p className="empty">Carregando dados...</p>
+      ) : !metrics ? (
+        <p className="empty">Selecione um board para visualizar os dados</p>
+      ) : (
+        <>
+          {/* CARDS */}
+          <div className="cards">
+            <div className="card">
+              <h3>Total</h3>
+              <p>{metrics.total}</p>
+            </div>
 
-      <h3>Gargalo:</h3>
-      <p>{metrics.gargalo}</p>
+            <div className="card backlog">
+              <h3>Backlog</h3>
+              <p>{metrics.backlog}</p>
+            </div>
+
+            <div className="card andamento">
+              <h3>Em andamento</h3>
+              <p>{metrics.emAndamento}</p>
+            </div>
+
+            <div className="card concluido">
+              <h3>Concluídas</h3>
+              <p>{metrics.concluidas}</p>
+            </div>
+
+            <div className="card destaque">
+              <h3>Produtividade</h3>
+              <p>{metrics.produtividade}%</p>
+            </div>
+          </div>
+
+          <div className="box insight">
+            <h3>Insight</h3>
+            <p>{metrics.insight}</p>
+          </div>
+
+          <div className="box gargalo">
+            <h3>Gargalo</h3>
+            <p>{metrics.gargalo}</p>
+          </div>
+        </>
+      )}
     </div>
   );
 }
