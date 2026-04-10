@@ -25,6 +25,19 @@ export async function getBoards() {
     throw err;
   }
 }
+export async function getBoardData(boardId) {
+  const { key, token } = getEnv();
+
+  const response = await axios.get(
+    `https://api.trello.com/1/boards/${boardId}?lists=open&cards=open&members=all&key=${key}&token=${token}`
+  );
+
+  return {
+    lists: response.data.lists || [],
+    cards: response.data.cards || [],
+    members: response.data.members || []
+  };
+}
 
 export async function getMetrics(boardId) {
   try {
@@ -35,13 +48,12 @@ export async function getMetrics(boardId) {
     }
 
     const response = await axios.get(
-      `https://api.trello.com/1/boards/${boardId}?lists=open&cards=open&key=${key}&token=${token}`
+      `https://api.trello.com/1/boards/${boardId}?lists=open&cards=open&members=all&key=${key}&token=${token}`
     );
-
-    console.log("DEBUG RESPONSE:", response.data);
 
     const listas = response.data.lists || [];
     const cards = response.data.cards || [];
+    const members = response.data.members || [];
 
     const palavrasDone = ["done", "conclu", "final", "feito"];
     const palavrasDoing = ["andamento", "doing", "progress"];
@@ -81,6 +93,26 @@ export async function getMetrics(boardId) {
       (produtividade * 100).toFixed(1)
     );
 
+    const tarefasPorMembro = members.map(member => {
+      const quantidade = cards.filter(c =>
+        c.idMembers.includes(member.id)
+      ).length;
+
+      return {
+        nome: member.fullName,
+        quantidade
+      };
+    });
+
+    // 📈 NOVO — histórico (simulado)
+    const historico = [
+      Math.max(concluidas - 10, 0),
+      Math.max(concluidas - 5, 0),
+      Math.max(concluidas - 2, 0),
+      concluidas
+    ];
+
+    // 🧠 INSIGHT (mantido e melhorado)
     let insight = "";
 
     if (produtividade > 0.7 && emAndamento < concluidas) {
@@ -91,6 +123,7 @@ export async function getMetrics(boardId) {
       insight = "Fluxo estável.";
     }
 
+    // 🚧 GARGALO (mantido)
     let gargalo = "";
 
     if (emAndamento > concluidas * 1.5) {
@@ -110,6 +143,8 @@ export async function getMetrics(boardId) {
       concluidas,
       naoClassificadas,
       produtividade: produtividadePercent,
+      tarefasPorMembro,
+      historico,
       insight,
       gargalo
     };
