@@ -6,7 +6,6 @@ export async function getMetrics(boardId) {
 
   const total = cards.length;
 
-  // 🔥 identificar listas
   const backlogList = lists.find(l => l.name.toLowerCase().includes("backlog"));
   const andamentoList = lists.find(l => l.name.toLowerCase().includes("andamento"));
   const doneList = lists.find(l => l.name.toLowerCase().includes("concluído"));
@@ -19,7 +18,6 @@ export async function getMetrics(boardId) {
     ? Math.round((concluidas / total) * 100)
     : 0;
 
-  // 👥 tarefas por membro
   const tarefasPorMembro = members.map(member => {
     const quantidade = cards.filter(c =>
       c.idMembers.includes(member.id)
@@ -31,7 +29,6 @@ export async function getMetrics(boardId) {
     };
   });
 
-  // 📈 histórico (simulado por enquanto)
   const historico = [
     Math.max(concluidas - 10, 0),
     Math.max(concluidas - 5, 0),

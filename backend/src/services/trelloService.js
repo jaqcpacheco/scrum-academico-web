@@ -1,18 +1,19 @@
 import axios from "axios";
 
-function getEnv() {
+function getEnv(customKey, customToken) {
   return {
-    key: process.env.TRELLO_KEY,
-    token: process.env.TRELLO_TOKEN
+    key: customKey || process.env.TRELLO_KEY,
+    token: customToken || process.env.TRELLO_TOKEN
   };
 }
 
-export async function getBoards() {
-  try {
-    const { key, token } = getEnv();
 
-    console.log("KEY:", key);
-    console.log("TOKEN:", token);
+export async function getBoards(customKey, customToken) {
+  try {
+    const { key, token } = getEnv(customKey, customToken);
+
+    console.log("KEY FINAL:", key);
+    console.log("TOKEN FINAL:", token);
 
     const response = await axios.get(
       `https://api.trello.com/1/members/me/boards?key=${key}&token=${token}`
@@ -25,6 +26,7 @@ export async function getBoards() {
     throw err;
   }
 }
+
 export async function getBoardData(boardId) {
   const { key, token } = getEnv();
 
@@ -39,17 +41,25 @@ export async function getBoardData(boardId) {
   };
 }
 
-export async function getMetrics(boardId) {
+
+export async function getMetrics(boardId, customKey, customToken) {
   try {
-    const { key, token } = getEnv();
+    const { key, token } = getEnv(customKey, customToken);
+    
+    console.log("KEY METRICS:", key);
+    console.log("TOKEN METRICS:", token);
 
     if (!boardId) {
       throw new Error("BoardId não informado");
     }
 
     const response = await axios.get(
-      `https://api.trello.com/1/boards/${boardId}?lists=open&cards=open&members=all&key=${key}&token=${token}`
+      `https://api.trello.com/1/boards/${boardId}`
     );
+    
+    if (!response.data) {
+    throw new Error("Resposta inválida da API do Trello");
+    }
 
     const listas = response.data.lists || [];
     const cards = response.data.cards || [];
@@ -94,9 +104,9 @@ export async function getMetrics(boardId) {
     );
 
     const tarefasPorMembro = members.map(member => {
-      const quantidade = cards.filter(c =>
-        c.idMembers.includes(member.id)
-      ).length;
+    const quantidade = cards.filter(c =>
+    (c.idMembers || []).includes(member.id)
+  ).length;
 
       return {
         nome: member.fullName,
@@ -104,7 +114,6 @@ export async function getMetrics(boardId) {
       };
     });
 
-    // 📈 NOVO — histórico (simulado)
     const historico = [
       Math.max(concluidas - 10, 0),
       Math.max(concluidas - 5, 0),
@@ -112,7 +121,6 @@ export async function getMetrics(boardId) {
       concluidas
     ];
 
-    // 🧠 INSIGHT (mantido e melhorado)
     let insight = "";
 
     if (produtividade > 0.7 && emAndamento < concluidas) {
@@ -123,7 +131,6 @@ export async function getMetrics(boardId) {
       insight = "Fluxo estável.";
     }
 
-    // 🚧 GARGALO (mantido)
     let gargalo = "";
 
     if (emAndamento > concluidas * 1.5) {

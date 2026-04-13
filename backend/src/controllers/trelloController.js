@@ -14,7 +14,13 @@ export async function fetchMetrics(req, res) {
     const { boardId } = req.params;
     const data = await getMetrics(boardId);
     return res.json(data);
-  } catch (err) {
-    return res.status(500).json({ error: "Erro ao calcular métricas" });
+  } 
+  catch (error) {
+  console.error("ERRO REAL METRICS:", error);
+
+  res.status(500).json({
+    error: error.message,
+    detalhe: error.response?.data || null
+  });
   }
 }
