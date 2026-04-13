@@ -1,14 +1,9 @@
 import axios from "axios";
 
-// =========================
-// ⚙️ CONFIG
-// =========================
+
 const USAR_IA = true;
 const MODO_SIMULACAO = true; // 👉 começa true, depois coloca false pra IA real
 
-// =========================
-// 🔐 ENV
-// =========================
 function getEnv(customKey, customToken) {
   return {
     key: customKey || process.env.TRELLO_KEY,
@@ -16,9 +11,7 @@ function getEnv(customKey, customToken) {
   };
 }
 
-// =========================
-// 📋 BOARDS
-// =========================
+
 export async function getBoards(customKey, customToken) {
   try {
     const { key, token } = getEnv(customKey, customToken);
@@ -35,9 +28,7 @@ export async function getBoards(customKey, customToken) {
   }
 }
 
-// =========================
-// 📦 BOARD DATA
-// =========================
+
 export async function getBoardData(boardId, customKey, customToken) {
   try {
     const { key, token } = getEnv(customKey, customToken);
@@ -58,15 +49,13 @@ export async function getBoardData(boardId, customKey, customToken) {
   }
 }
 
-// =========================
-// 🤖 IA
-// =========================
+
 async function gerarInsightIA(dados) {
 
   console.log("🤖 IA ATIVA:", USAR_IA);
   console.log("🧪 SIMULAÇÃO:", MODO_SIMULACAO);
 
-  // 🔥 SIMULAÇÃO (SEM CUSTO)
+
   if (MODO_SIMULACAO) {
     return `🤖 [SIMULAÇÃO] A equipe possui ${dados.taxaConclusao}% de conclusão, com eficiência de ${dados.eficiencia}. O fluxo apresenta oportunidades de melhoria.`;
   }
@@ -113,9 +102,7 @@ async function gerarInsightIA(dados) {
   }
 }
 
-// =========================
-// 📊 MÉTRICAS
-// =========================
+
 export async function getMetrics(boardId, customKey, customToken) {
   try {
     const { key, token } = getEnv(customKey, customToken);
@@ -130,9 +117,6 @@ export async function getMetrics(boardId, customKey, customToken) {
     const cards = response.data.cards || [];
     const members = response.data.members || [];
 
-    // =========================
-    // 🔎 IDENTIFICAÇÃO DE LISTAS
-    // =========================
     const palavrasDone = ["done", "conclu", "final", "feito"];
     const palavrasDoing = ["andamento", "doing"];
     const palavrasBacklog = ["backlog", "to do", "afazer"];
@@ -148,9 +132,7 @@ export async function getMetrics(boardId, customKey, customToken) {
     const listaAndamento = encontrarLista(palavrasDoing);
     const listaBacklog = encontrarLista(palavrasBacklog);
 
-    // =========================
-    // 📊 CONTAGEM
-    // =========================
+
     const total = cards.length;
 
     const concluidas = listaConcluido
@@ -165,9 +147,7 @@ export async function getMetrics(boardId, customKey, customToken) {
       ? cards.filter(c => c.idList === listaBacklog.id).length
       : 0;
 
-    // =========================
-    // 📈 MÉTRICAS
-    // =========================
+
     const produtividade = total > 0 ? concluidas / total : 0;
     const produtividadePercent = Number((produtividade * 100).toFixed(1));
 
@@ -178,9 +158,7 @@ export async function getMetrics(boardId, customKey, customToken) {
       ? Number((concluidas / emAndamento).toFixed(2))
       : concluidas;
 
-    // =========================
-    // 👥 MEMBROS
-    // =========================
+
     const tarefasPorMembro = members.map(member => {
       const quantidade = cards.filter(c =>
         c.idMembers.includes(member.id)
@@ -198,18 +176,14 @@ export async function getMetrics(boardId, customKey, customToken) {
       ? Number((cargaTotal / tarefasPorMembro.length).toFixed(2))
       : 0;
 
-    // =========================
-    // 🚨 GARGALO SIMPLES
-    // =========================
+
     let gargalo = "Fluxo equilibrado.";
 
     if (emAndamento > concluidas * 1.5) {
       gargalo = "Alto volume de tarefas em andamento.";
     }
 
-    // =========================
-    // 🤖 INSIGHT COM IA
-    // =========================
+
     let insight = "Não foi possível gerar insight.";
 
     if (USAR_IA) {
@@ -227,9 +201,7 @@ export async function getMetrics(boardId, customKey, customToken) {
       }
     }
 
-    // =========================
-    // 📊 HISTÓRICO
-    // =========================
+
     const historico = [
       Math.max(concluidas - 10, 0),
       Math.max(concluidas - 5, 0),
