@@ -53,7 +53,7 @@ TRELLO_KEY=your_key
 TRELLO_TOKEN=your_token
 OPENAI_API_KEY=your_api_key
 📌 Observações
-O projeto está em desenvolvimento acadêmico (TCC)
+O projeto está em desenvolvimento acadêmico (PDS)
 A integração com IA pode ser ativada ou desativada via configuração
 O sistema depende de boards do Trello para funcionamento
 💼 Objetivo
