@@ -1,5 +1,4 @@
 import { getBoardData } from "./trelloService.js";
-import { generateInsight } from "../utils/insights.js";
 
 export async function getMetrics(boardId) {
   const { lists, cards, members } = await getBoardData(boardId);
@@ -36,7 +35,6 @@ export async function getMetrics(boardId) {
     concluidas
   ];
 
-  const insight = generateInsight({ emAndamento, concluidas });
 
   const gargalo =
     emAndamento > concluidas
