@@ -11,7 +11,7 @@ export default function LoginPage({ onConnect }) {
         </h1>
 
         <p className="text-slate-400 mb-6">
-          Analise o desempenho da sua equipe com métricas Scrum
+          Analise o desempenho da sua equipe com métricas Scrum e KANBAN
         </p>
 
         <button

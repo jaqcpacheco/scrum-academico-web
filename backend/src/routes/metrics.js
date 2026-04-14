@@ -1,5 +1,5 @@
 import express from "express";
-import { getMetrics } from "../services/metricsService.js";
+import { getMetrics } from "../services/trelloService.js";
 
 const router = express.Router(); // 👈 também precisa
 
