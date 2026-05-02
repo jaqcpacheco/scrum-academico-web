@@ -1,96 +1,98 @@
 import {
-  ArrowUpRight,
-  ArrowDownRight,
   Activity,
-  CheckCircle,
   Clock,
+  CheckCircle,
+  TrendingUp,
   List
 } from "lucide-react";
 
 export default function Card({ title, value }) {
 
-  // 🎯 CONFIG DINÂMICA
   const config = {
-    "Total": {
+    "Total de Tarefas": {
       icon: <List />,
-      extra: "Total de tarefas no board",
-      color: "text-slate-400",
-      trend: "up"
+      desc: "Volume total",
+      color: "text-blue-400",
+      bg: "bg-blue-500/10"
     },
 
     "Backlog": {
       icon: <Clock />,
-      extra: "Tarefas pendentes",
+      desc: "Tarefas pendentes",
       color: "text-yellow-400",
-      trend: "up"
+      bg: "bg-yellow-500/10"
     },
 
-    "Em andamento": {
+    "Em Progresso": {
       icon: <Activity />,
-      extra: "Tarefas em execução",
-      color: "text-blue-400",
-      trend: "up"
+      desc: "Em execução",
+      color: "text-red-400",
+      bg: "bg-red-500/10"
     },
 
     "Concluídas": {
       icon: <CheckCircle />,
-      extra: "Tarefas finalizadas",
+      desc: "Finalizadas",
       color: "text-green-400",
-      trend: "up"
+      bg: "bg-green-500/10"
     },
 
     "Produtividade": {
-      icon: <Activity />,
-      extra: "Eficiência do time",
+      icon: <TrendingUp />,
+      desc: "Eficiência do time",
       color: "text-green-400",
-      trend: "up"
+      bg: "bg-green-500/10"
     },
 
-    "Lead Time": {
-      icon: <Clock />,
-      extra: "Tempo médio de entrega",
-      color: "text-orange-400",
-      trend: "down"
+    "WIP": {
+      icon: <Activity />,
+      desc: "Work in progress",
+      color: "text-blue-400",
+      bg: "bg-blue-500/10"
+    },
+
+    "Eficiência": {
+      icon: <TrendingUp />,
+      desc: "Throughput",
+      color: "text-green-400",
+      bg: "bg-green-500/10"
     }
   };
 
   const item = config[title] || {
     icon: <Activity />,
-    extra: "",
+    desc: "",
     color: "text-slate-400",
-    trend: "up"
+    bg: "bg-slate-500/10"
   };
 
   return (
-    <div
-      className="
-        bg-slate-900/50
-        border border-slate-800
-        rounded-2xl
-        p-5
-        flex flex-col gap-4
-        backdrop-blur-md
-        transition-all duration-300
-        hover:scale-[1.02]
-        hover:shadow-lg
-      "
-    >
+    <div className="
+      bg-slate-900/60
+      border border-slate-800
+      rounded-2xl
+      p-5
+      flex flex-col gap-4
+      backdrop-blur-md
+      transition-all duration-300
+      hover:scale-[1.02]
+      hover:shadow-xl
+    ">
 
-  
-      <div className="flex items-center justify-between">
+    
+      <div className="flex justify-between items-center">
 
-        <div className="p-2 rounded-lg bg-slate-800 text-blue-400">
+        <div className={`p-2 rounded-lg ${item.bg} ${item.color}`}>
           {item.icon}
         </div>
 
-        {item.trend === "up" ? (
-          <ArrowUpRight className="text-green-400" />
-        ) : (
-          <ArrowDownRight className="text-red-400" />
-        )}
+        <span className="text-green-400 text-sm font-medium">
+          ↗
+        </span>
+
       </div>
 
-    
+      
       <p className="text-slate-400 text-sm">
         {title}
       </p>
@@ -102,7 +104,7 @@ export default function Card({ title, value }) {
 
       
       <p className={`text-sm ${item.color}`}>
-        {item.extra}
+        {item.desc}
       </p>
 
     </div>

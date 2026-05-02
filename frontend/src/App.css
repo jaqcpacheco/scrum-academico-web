@@ -195,3 +195,39 @@ select {
 .lg\:col-span-2 {
   grid-column: span 2;
 }
+.btn-historico {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn-historico:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.btn-voltar {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}

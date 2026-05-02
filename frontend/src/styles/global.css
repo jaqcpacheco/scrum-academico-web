@@ -1,0 +1,24 @@
+@import "./tokens.css";
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-primary),
+    var(--color-bg-secondary),
+    #1e3a8a
+  );
+  color: var(--color-text);
+}
+
+select {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #1e293b;
+  color: white;
+  outline: none;
+  width: 280px;
+}

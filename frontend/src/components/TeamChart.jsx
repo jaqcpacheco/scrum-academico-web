@@ -1,21 +1,23 @@
 import {
   PieChart,
   Pie,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Cell
 } from "recharts";
 
-export default function TeamChart({ data }) {
+export default function TeamChart({ data = [] }) {
 
-  const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444"];
+  const COLORS = ["#22c55e", "#facc15", "#ef4444"];
 
-  if (!data || data.every(d => d.quantidade === 0)) {
+  //Segurança para evitar erros caso o array seja vazio ou contenha apenas zeros
+  if (!Array.isArray(data) || data.every(d => d.quantidade === 0)) {
     return (
-      <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800">
+      <div className="bg-slate-900/50 backdrop-blur-md p-6 rounded-2xl border border-slate-800">
         <h2 className="text-white mb-4 font-semibold">
           Distribuição da equipe
         </h2>
         <p className="text-slate-400">
-          Nenhuma tarefa atribuída 👥
+          Nenhuma tarefa atribuída 
         </p>
       </div>
     );
@@ -23,44 +25,51 @@ export default function TeamChart({ data }) {
 
   const total = data.reduce((acc, item) => acc + item.quantidade, 0);
 
-  const dataComCores = data.map((item, index) => ({
-  ...item,
-  fill: COLORS[index % COLORS.length]
-}));
-
   return (
-    <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800">
+    <div className="bg-slate-900/50 backdrop-blur-md p-6 rounded-2xl border border-slate-800">
 
       <h2 className="text-white mb-6 font-semibold">
         Distribuição da equipe
       </h2>
 
-      <div className="relative h-[250px]">
+      {/* Gráfico */}
+      <div className="relative h-[250px] flex items-center justify-center">
 
-        <ResponsiveContainer>
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-           <Pie
-            data={dataComCores}
-            dataKey="quantidade"
-            innerRadius={70}
-          outerRadius={90}
-          />
+            <Pie
+              data={data}
+              dataKey="quantidade"
+              nameKey="nome"
+              cx="50%"
+              cy="50%"
+              innerRadius={70}
+              outerRadius={100}
+              paddingAngle={3}
+            >
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Pie>
           </PieChart>
         </ResponsiveContainer>
 
-        
-        <div className="absolute inset-0 flex items-center justify-center flex-col">
-          <span className="text-2xl font-bold text-white">
+        {/* Centro do Donut */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-3xl font-bold text-white">
             {total}
           </span>
-          <span className="text-xs text-slate-400">
+          <span className="text-sm text-slate-400">
             tarefas
           </span>
         </div>
 
       </div>
 
-      
+      {/* Legenda */}
       <div className="mt-4 space-y-2">
         {data.map((item, index) => (
           <div key={index} className="flex justify-between text-sm">
