@@ -1,6 +1,7 @@
 import { getBoardData } from "../services/trelloService.js";
 import { calcularMetricas } from "../services/metricsService.js";
 import { processarHistorico } from "../services/historyService.js";
+import User from "../models/User.js";
 
 export async function fetchMetrics(req, res) {
   try {
@@ -13,7 +14,22 @@ export async function fetchMetrics(req, res) {
       });
     }
 
-    const dadosTrello = await getBoardData(boardId);
+    const { userId } = req.query;
+
+    const user = await User.findOne({ uid: userId });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado"
+      });
+    }
+
+    const dadosTrello = await getBoardData(
+      boardId,
+      user.trelloKey,
+      user.trelloToken
+    );
 
     if (!dadosTrello) {
       return res.status(404).json({
@@ -31,7 +47,11 @@ export async function fetchMetrics(req, res) {
       produtividade: dados.produtividade || dados.taxaConclusao || 0
     };
 
-    const variacao = await processarHistorico(boardId, dadosNormalizados);
+    const variacao = await processarHistorico(
+      userId,
+      boardId,
+      dadosNormalizados
+    );
 
     return res.json({
       success: true,
@@ -42,7 +62,7 @@ export async function fetchMetrics(req, res) {
     });
 
   } catch (error) {
-    console.error(" ERRO METRICS:", error);
+    console.error("ERRO METRICS:", error);
 
     return res.status(500).json({
       success: false,

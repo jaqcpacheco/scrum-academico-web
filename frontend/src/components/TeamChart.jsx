@@ -9,7 +9,6 @@ export default function TeamChart({ data = [] }) {
 
   const COLORS = ["#22c55e", "#facc15", "#ef4444"];
 
-  //Segurança para evitar erros caso o array seja vazio ou contenha apenas zeros
   if (!Array.isArray(data) || data.every(d => d.quantidade === 0)) {
     return (
       <div className="bg-slate-900/50 backdrop-blur-md p-6 rounded-2xl border border-slate-800">
@@ -32,7 +31,6 @@ export default function TeamChart({ data = [] }) {
         Distribuição da equipe
       </h2>
 
-      {/* Gráfico */}
       <div className="relative h-[250px] flex items-center justify-center">
 
         <ResponsiveContainer width="100%" height="100%">
@@ -57,7 +55,6 @@ export default function TeamChart({ data = [] }) {
           </PieChart>
         </ResponsiveContainer>
 
-        {/* Centro do Donut */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-3xl font-bold text-white">
             {total}
@@ -69,7 +66,6 @@ export default function TeamChart({ data = [] }) {
 
       </div>
 
-      {/* Legenda */}
       <div className="mt-4 space-y-2">
         {data.map((item, index) => (
           <div key={index} className="flex justify-between text-sm">

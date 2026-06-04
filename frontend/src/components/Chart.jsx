@@ -19,7 +19,6 @@ export default function Chart({ data }) {
   return (
     <div className=" bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl border border-slate-800 shadow-lg">
 
-      {/* header */}
       <div className=" mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-white font-semibold text-lg">
@@ -35,19 +34,17 @@ export default function Chart({ data }) {
         </span>
       </div>
 
-      {/* Chart */}
+
       <div className=" w-full h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData}>
 
-            {/* Grid suave */}
             <CartesianGrid
               stroke="#1e293b"
               strokeDasharray="4 4"
               vertical={false}
             />
 
-            {/* Eixos */}
             <XAxis
               dataKey="dia"
               stroke="#64748b"
@@ -61,7 +58,6 @@ export default function Chart({ data }) {
               axisLine={false}
             />
 
-            {/* Tooltip */}
             <Tooltip
               cursor={{ stroke: "#6366f1", strokeWidth: 1 }}
               contentStyle={{
@@ -74,7 +70,6 @@ export default function Chart({ data }) {
               labelStyle={{ color: "#94a3b8" }}
             />
 
-            {/* Gradiente */}
             <defs>
               <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#6366f1" stopOpacity={0.9}/>
@@ -83,7 +78,7 @@ export default function Chart({ data }) {
               </linearGradient>
             </defs>
 
-            {/* Área com animação */}
+
             <Area
               type="monotone"
               dataKey="valor"
@@ -91,12 +86,11 @@ export default function Chart({ data }) {
               strokeWidth={3}
               fill="url(#colorGradient)"
 
-              //Animação
+
               isAnimationActive={true}
               animationDuration={1200}
               animationEasing="ease-out"
 
-              //Pontos
               dot={{
                 r: 4,
                 stroke: "#6366f1",

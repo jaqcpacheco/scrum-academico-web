@@ -1,29 +1,43 @@
 import mongoose from "mongoose";
 
-const historySchema = new mongoose.Schema({
-  boardId: {
-    type: String,
-    required: true
+const historySchema = new mongoose.Schema(
+  {
+    userId: {
+      type: String,
+      required: true
+    },
+
+    boardId: {
+      type: String,
+      required: true
+    },
+
+    total: Number,
+
+    concluidas: Number,
+
+    emAndamento: Number,
+
+    backlog: Number,
+
+    produtividade: Number,
+
+    eficiencia: Number,
+
+    wip: Number,
+
+    insight: String,
+
+    porcentagens: {
+      concluidas: Number,
+      emAndamento: Number,
+      backlog: Number
+    }
   },
 
-  total: Number,
-  concluidas: Number,
-  emAndamento: Number,
-  backlog: Number,
-
-  produtividade: Number, // % de conclusão
-  eficiencia: Number,
-  wip: Number,
-  insight: String,
-
-  porcentagens: {
-    concluidas: Number,
-    emAndamento: Number,
-    backlog: Number
+  {
+    timestamps: true
   }
-
-}, {
-  timestamps: true
-});
+);
 
 export default mongoose.model("History", historySchema);

@@ -1,19 +1,15 @@
-// routes/historyRoutes.js
-
 import express from "express";
-import History from "../models/History.js";
 
-const router = express.Router();
+import {
+  getHistory
+} from "../controllers/historyController.js";
 
-router.get("/", async (req, res) => {
-  try {
-    const historico = await History.find()
-      .sort({ createdAt: -1 });
+const router =
+  express.Router();
 
-    res.json(historico);
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao buscar histórico" });
-  }
-});
+router.get(
+  "/",
+  getHistory
+);
 
 export default router;
