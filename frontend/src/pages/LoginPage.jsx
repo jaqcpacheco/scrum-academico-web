@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
 
@@ -93,7 +94,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setErro("");
     try {
-      setLoading(true);
+      setLoadingGoogle(true);
       const result = await signInWithPopup(auth, googleProvider);
       await salvarUsuarioSistema({
         uid: result.user.uid,
@@ -106,7 +107,7 @@ export default function LoginPage() {
         setErro(err.message);
       }
     } finally {
-      setLoading(false);
+      setLoadingGoogle(false);
     }
   };
 
@@ -188,7 +189,7 @@ export default function LoginPage() {
 
         <button
           onClick={handleGoogleLogin}
-          disabled={loading}
+          disabled={loadingGoogle}
           className="w-full bg-white hover:bg-slate-200 disabled:opacity-50 px-4 py-3 rounded-xl text-black font-semibold flex items-center justify-center gap-3"
         >
           <svg width="20" height="20" viewBox="0 0 48 48">
@@ -198,7 +199,7 @@ export default function LoginPage() {
             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.96 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
             <path fill="none" d="M0 0h48v48H0z"/>
           </svg>
-          {loading ? "Carregando..." : "Entrar com Google"}
+          {loadingGoogle ? "Carregando..." : "Entrar com Google"}
         </button>
 
         <button
