@@ -133,7 +133,7 @@ export default function LoginPage() {
 
         <div className="flex flex-col items-center text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center text-3xl shadow-lg mb-5">
-            🧠
+            ⚡
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">Project Minds</h1>
           <p className="text-slate-400 text-sm">Smart Agile Intelligence Platform</p>
