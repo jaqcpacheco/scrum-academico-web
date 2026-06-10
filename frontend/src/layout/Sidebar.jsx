@@ -10,6 +10,8 @@ export default function Sidebar({
   setSelectedBoard,
   gerarPDF,
 }) {
+  const isManager = systemUser?.role === "manager";
+
   return (
     <aside className="
       w-[260px]
@@ -25,6 +27,7 @@ export default function Sidebar({
     ">
 
       <div>
+        {/* LOGO */}
         <div className="flex items-center gap-3 mb-10">
           <div className="
             w-11 h-11
@@ -45,6 +48,7 @@ export default function Sidebar({
           </div>
         </div>
 
+        {/* MENU PRINCIPAL */}
         <nav className="space-y-1">
           <SidebarItem
             icon="boards"
@@ -86,14 +90,18 @@ export default function Sidebar({
           />
         </nav>
 
+        {/* DIVISOR */}
         <div className="my-6 border-t border-white/5" />
 
+        {/* AÇÕES — PDF só para Scrum Master */}
         <nav className="space-y-1">
-          <SidebarItem
-            icon="pdf"
-            title="Exportar PDF"
-            onClick={gerarPDF}
-          />
+          {isManager && (
+            <SidebarItem
+              icon="pdf"
+              title="Exportar PDF"
+              onClick={gerarPDF}
+            />
+          )}
           <SidebarItem
             icon="config"
             title="Configurações"
@@ -103,6 +111,7 @@ export default function Sidebar({
         </nav>
       </div>
 
+      {/* USUÁRIO */}
       <UserCard systemUser={systemUser} user={user} />
 
     </aside>

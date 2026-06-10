@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import Historico from "./pages/Historico";
 import ConnectTrello from "./pages/ConnectTrello";
+import InvitePage from "./pages/InvitePage";
 import { BASE_URL, authFetch } from "./services/api.js";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase";
 
-export default function App() {
+function Main() {
   const [boards, setBoards] = useState([]);
   const [selectedBoard, setSelectedBoard] = useState("");
   const [metrics, setMetrics] = useState(null);
@@ -23,9 +25,7 @@ export default function App() {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
-
         const savedUser = localStorage.getItem("user");
-
         if (savedUser) {
           const parsed = JSON.parse(savedUser);
           if (parsed) setSystemUser(parsed?.user || parsed);
@@ -35,15 +35,14 @@ export default function App() {
         setSystemUser(null);
         localStorage.removeItem("user");
       }
-
       setLoadingAuth(false);
     });
-
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (!user || !systemUser) return;
+    if (systemUser.role === "member") return; // membro não busca boards
 
     const fetchBoards = async () => {
       try {
@@ -59,7 +58,6 @@ export default function App() {
         console.error("ERRO BOARDS:", err);
       }
     };
-
     fetchBoards();
   }, [user, systemUser]);
 
@@ -69,7 +67,6 @@ export default function App() {
     const fetchMetrics = async () => {
       try {
         setLoading(true);
-
         const res = await authFetch(
           `${BASE_URL}/metrics/${selectedBoard}?userId=${systemUser.uid}`
         );
@@ -82,7 +79,6 @@ export default function App() {
         setLoading(false);
       }
     };
-
     fetchMetrics();
   }, [selectedBoard, systemUser]);
 
@@ -104,7 +100,8 @@ export default function App() {
     );
   }
 
-  if (user && systemUser && systemUser.trelloConnected !== true) {
+  // ✅ membro não precisa conectar Trello
+  if (user && systemUser && systemUser.role !== "member" && systemUser.trelloConnected !== true) {
     return (
       <ConnectTrello
         systemUser={systemUser}
@@ -131,5 +128,16 @@ export default function App() {
       user={user}
       systemUser={systemUser}
     />
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/invite/:code" element={<InvitePage />} />
+        <Route path="*" element={<Main />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

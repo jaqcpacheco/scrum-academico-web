@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../services/firebase";
-import { BASE_URL } from "../services/api.js";
+import { BASE_URL, authFetch } from "../services/api.js";
 
 export default function Settings({ systemUser, user }) {
   const [loading, setLoading] = useState(false);
   const [sucesso, setSucesso] = useState("");
   const [erro, setErro] = useState("");
+  const [inviteLink, setInviteLink] = useState("");
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const nome = systemUser?.nome || user?.displayName || "Usuário";
   const email = systemUser?.email || user?.email || "";
@@ -14,6 +17,7 @@ export default function Settings({ systemUser, user }) {
   const inicial = nome?.[0]?.toUpperCase() || "U";
   const trelloConnected = systemUser?.trelloConnected === true;
   const trelloUsername = systemUser?.trelloUsername || "";
+  const isManager = systemUser?.role === "manager";
 
   const handleDisconnectTrello = async () => {
     try {
@@ -43,6 +47,42 @@ export default function Settings({ systemUser, user }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGenerateInvite = async () => {
+    try {
+      setInviteLoading(true);
+      setErro("");
+      setInviteLink("");
+      setCopied(false);
+
+      const saved = JSON.parse(localStorage.getItem("user"));
+      const uid = saved?.user?.uid || saved?.uid;
+
+      const res = await authFetch(`${BASE_URL}/invites/generate`, {
+        method: "POST",
+        body: JSON.stringify({ userId: uid }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setInviteLink(data.link);
+      } else {
+        setErro(data.error || "Erro ao gerar convite");
+      }
+    } catch (err) {
+      setErro("Erro ao gerar convite");
+      console.error(err);
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(inviteLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleLogout = async () => {
@@ -83,7 +123,6 @@ export default function Settings({ systemUser, user }) {
         </h2>
 
         <div className="flex items-center gap-5">
-          {/* AVATAR */}
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-violet-500/20 shrink-0 overflow-hidden">
             {foto
               ? <img src={foto} alt={nome} className="w-16 h-16 object-cover rounded-full" />
@@ -91,61 +130,100 @@ export default function Settings({ systemUser, user }) {
             }
           </div>
 
-          {/* INFO */}
           <div className="flex-1 min-w-0">
             <p className="text-white font-semibold text-lg truncate">{nome}</p>
             <p className="text-slate-400 text-sm truncate">{email}</p>
-            <span className="inline-block mt-2 text-xs px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/20 font-medium">
-              {systemUser?.role === "manager" ? "Agile Manager" : "Membro"}
+            <span className={`inline-block mt-2 text-xs px-2.5 py-1 rounded-full font-medium border ${
+              isManager
+                ? "bg-blue-500/15 text-blue-400 border-blue-500/20"
+                : "bg-violet-500/15 text-violet-400 border-violet-500/20"
+            }`}>
+              {isManager ? "Scrum Master" : "Membro da Equipe"}
             </span>
           </div>
         </div>
       </div>
 
-      {/* TRELLO */}
-      <div className="p-6 rounded-2xl border border-white/5 bg-white/[0.03] mb-4">
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-5">
-          Integração Trello
-        </h2>
+      {/* TRELLO — só para Scrum Master */}
+      {isManager && (
+        <div className="p-6 rounded-2xl border border-white/5 bg-white/[0.03] mb-4">
+          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-5">
+            Integração Trello
+          </h2>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {/* ÍCONE TRELLO */}
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${trelloConnected ? "bg-blue-500/15 border border-blue-500/20" : "bg-slate-700/50 border border-slate-600/30"}`}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={trelloConnected ? "#60a5fa" : "#64748b"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="3"/>
-                <rect x="6" y="6" width="4" height="10" rx="1"/>
-                <rect x="14" y="6" width="4" height="6" rx="1"/>
-              </svg>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${trelloConnected ? "bg-blue-500/15 border border-blue-500/20" : "bg-slate-700/50 border border-slate-600/30"}`}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={trelloConnected ? "#60a5fa" : "#64748b"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="3"/>
+                  <rect x="6" y="6" width="4" height="10" rx="1"/>
+                  <rect x="14" y="6" width="4" height="6" rx="1"/>
+                </svg>
+              </div>
+
+              <div>
+                <p className="text-white font-medium">Trello</p>
+                {trelloConnected
+                  ? <p className="text-sm text-emerald-400">● Conectado{trelloUsername ? ` como @${trelloUsername}` : ""}</p>
+                  : <p className="text-sm text-slate-400">● Não conectado</p>
+                }
+              </div>
             </div>
 
-            <div>
-              <p className="text-white font-medium">Trello</p>
-              {trelloConnected
-                ? <p className="text-sm text-emerald-400">● Conectado{trelloUsername ? ` como @${trelloUsername}` : ""}</p>
-                : <p className="text-sm text-slate-400">● Não conectado</p>
-              }
-            </div>
+            {trelloConnected ? (
+              <button
+                onClick={handleDisconnectTrello}
+                disabled={loading}
+                className="px-4 py-2 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-all disabled:opacity-50"
+              >
+                {loading ? "Desconectando..." : "Desconectar"}
+              </button>
+            ) : (
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-400 text-sm font-medium hover:bg-blue-500/20 transition-all"
+              >
+                Conectar
+              </button>
+            )}
           </div>
+        </div>
+      )}
 
-          {trelloConnected ? (
-            <button
-              onClick={handleDisconnectTrello}
-              disabled={loading}
-              className="px-4 py-2 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-all disabled:opacity-50"
-            >
-              {loading ? "Desconectando..." : "Desconectar"}
-            </button>
-          ) : (
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-400 text-sm font-medium hover:bg-blue-500/20 transition-all"
-            >
-              Conectar
-            </button>
+      {/* CONVITE — só para Scrum Master */}
+      {isManager && (
+        <div className="p-6 rounded-2xl border border-white/5 bg-white/[0.03] mb-4">
+          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            Convidar Membro
+          </h2>
+          <p className="text-slate-400 text-sm mb-5">
+            Gere um link de convite para adicionar membros à sua equipe. O link expira em 7 dias.
+          </p>
+
+          <button
+            onClick={handleGenerateInvite}
+            disabled={inviteLoading}
+            className="px-4 py-2 rounded-xl border border-violet-500/30 bg-violet-500/10 text-violet-400 text-sm font-medium hover:bg-violet-500/20 transition-all disabled:opacity-50 mb-4"
+          >
+            {inviteLoading ? "Gerando..." : "✨ Gerar link de convite"}
+          </button>
+
+          {inviteLink && (
+            <div className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/50">
+              <p className="text-slate-400 text-xs mb-2">Link de convite:</p>
+              <div className="flex items-center gap-3">
+                <p className="text-white text-sm truncate flex-1">{inviteLink}</p>
+                <button
+                  onClick={handleCopy}
+                  className="px-3 py-1.5 rounded-lg bg-violet-500/20 text-violet-400 text-xs font-medium hover:bg-violet-500/30 transition-all shrink-0"
+                >
+                  {copied ? "✅ Copiado!" : "Copiar"}
+                </button>
+              </div>
+            </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* CONTA */}
       <div className="p-6 rounded-2xl border border-white/5 bg-white/[0.03]">

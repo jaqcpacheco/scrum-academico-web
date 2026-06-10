@@ -7,6 +7,7 @@ import historyRoutes from "./routes/historyRoutes.js";
 import boardsRoutes from "./routes/boardsRoutes.js";
 import metricsRoutes from "./routes/metricsRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import inviteRoutes from "./routes/inviteRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 
 dotenv.config();
@@ -34,7 +35,6 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-
 app.use(globalLimiter);
 
 
@@ -44,6 +44,7 @@ app.get("/", (req, res) => {
 
 
 app.use("/api/users", loginLimiter, userRoutes);
+app.use("/api/invites", inviteRoutes); // ✅ validate e accept são públicos
 
 
 app.use("/api/boards", authMiddleware, boardsRoutes);
