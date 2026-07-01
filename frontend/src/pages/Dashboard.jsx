@@ -151,7 +151,7 @@ export default function Dashboard({
         <h2>👥 Desempenho por Membro</h2>
         ${membrosHTML}
         <hr/>
-        <h2>🤖 Insight da IA</h2>
+        <h2> Insight da IA</h2>
         <div class="insight">${metrics.insight}</div>
       </body></html>
     `);
@@ -215,16 +215,14 @@ export default function Dashboard({
       <div id="relatorio">
         {loading && (
           <p className="text-slate-400 text-sm mb-6 animate-pulse">
-            ⏳ Carregando análise...
+             Carregando análise...
           </p>
         )}
 
-        {/* ✅ SETTINGS — aparece sempre, independente do board */}
         {activePage === "settings" && (
           <Settings systemUser={systemUser} user={user} />
         )}
 
-        {/* ====== TELA DE BOARDS ====== */}
         {activePage !== "settings" && !selectedBoard && (
           <div>
             <div className="flex items-center justify-between mb-8">
@@ -323,7 +321,6 @@ export default function Dashboard({
           </div>
         )}
 
-        {/* BOARD SEM SELEÇÃO */}
         {activePage !== "settings" && !selectedBoard && activePage !== "boards" && (
           <div className="flex flex-col items-center justify-center text-center py-24">
             <div className="text-6xl mb-6">📂</div>
@@ -332,7 +329,6 @@ export default function Dashboard({
           </div>
         )}
 
-        {/* ====== TELA DE MÉTRICAS ====== */}
         {activePage !== "settings" && selectedBoard && metrics && (
           <>
             <div className="flex items-center justify-between mb-10">
@@ -365,7 +361,13 @@ export default function Dashboard({
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-10">
                   <Chart
                     data={historico.length > 0
-                      ? historico.map(item => ({ dia: new Date(item.createdAt).toLocaleDateString(), valor: item.concluidas }))
+                      ? [...historico]
+                          .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+                          .slice(-7)
+                          .map(item => ({
+                            dia: new Date(item.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+                            valor: item.concluidas
+                          }))
                       : []}
                   />
                   <TeamChart
