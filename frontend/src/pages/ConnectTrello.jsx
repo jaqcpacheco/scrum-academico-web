@@ -83,7 +83,7 @@ export default function ConnectTrello({ systemUser, onConnected }) {
 
   return (
       <div className="h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white p-6 overflow-hidden">
-      <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+      <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 w-full max-w-sm shadow-2xl">
 
         <div className="flex justify-center mb-6">
           <div className="w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-5xl">
@@ -124,21 +124,21 @@ export default function ConnectTrello({ systemUser, onConnected }) {
         <button
           onClick={handleTrelloAuth}
           disabled={loading}
-          className="w-full bg-blue-500 hover:bg-blue-600 transition-all duration-300 px-6 py-4 rounded-2xl font-semibold text-lg shadow-lg disabled:opacity-50"
+          className="w-full bg-blue-500 hover:bg-blue-600 transition-all duration-300 px-4 py-3 rounded-2xl font-semibold text-lg shadow-lg disabled:opacity-50"
         >
           {loading ? "Conectando..." : "Conectar com Trello"}
         </button>
 
         <button
           onClick={handleBackToLogin}
-          className="mt-4 w-full border border-slate-700 hover:border-blue-500 hover:bg-slate-800 transition-all duration-300 px-6 py-4 rounded-2xl font-medium text-slate-300"
+          className="mt-4 w-full border border-slate-700 hover:border-blue-500 hover:bg-slate-800 transition-all duration-300 px-4 py-3 rounded-2xl font-medium text-slate-300"
         >
           Conectar outra conta
         </button>
 
         <button
           onClick={handleBackToLogin}
-          className="mt-4 w-full border border-slate-700 hover:border-red-500 hover:bg-slate-800 transition-all duration-300 px-6 py-4 rounded-2xl font-medium text-slate-300"
+          className="mt-4 w-full border border-slate-700 hover:border-red-500 hover:bg-slate-800 transition-all duration-300 px-4 py-3 rounded-2xl font-medium text-slate-300"
         >
           ← Voltar para Login
         </button>
