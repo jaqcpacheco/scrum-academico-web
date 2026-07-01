@@ -13,7 +13,6 @@ export async function processarHistorico(userId, boardId, dados) {
         backlog: (dados.backlog || 0) - (ultimo.backlog || 0)
       };
 
-      // Se o último registro foi criado hoje, atualiza em vez de criar novo
       const hoje = new Date();
       const dataUltimo = new Date(ultimo.createdAt);
       const mesmoDia =
