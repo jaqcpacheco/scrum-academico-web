@@ -82,8 +82,8 @@ export default function ConnectTrello({ systemUser, onConnected }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white p-6">
-      <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-10 w-full max-w-md shadow-2xl">
+      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white p-6 overflow-hidden">
+      <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
 
         <div className="flex justify-center mb-6">
           <div className="w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-5xl">
