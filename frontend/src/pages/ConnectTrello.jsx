@@ -1,151 +1,100 @@
-import { useEffect, useState, useCallback } from "react";
-import { signOut } from "firebase/auth";
-import { auth } from "../services/firebase";
+import { useState } from "react";
 import { BASE_URL } from "../services/api.js";
 
-export default function ConnectTrello({ systemUser, onConnected }) {
+export default function ConnectTrello({ systemUser }) {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
 
-  const handleBackToLogin = async () => {
-    await signOut(auth);
-    localStorage.clear();
-    sessionStorage.clear();
+  const handleConnect = async () => {
+    try {
+      setLoading(true);
+      setErro("");
+
+      const trelloKey = import.meta.env.VITE_TRELLO_KEY;
+      const returnUrl = `${window.location.origin}/trello-callback`;
+
+      const authUrl = `https://trello.com/1/authorize?expiration=never&name=ProjectMinds&scope=read&response_type=token&key=${trelloKey}&return_url=${returnUrl}&callback_method=fragment`;
+
+      window.location.href = authUrl;
+    } catch (err) {
+      setErro("Erro ao iniciar conexão com Trello.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOtherAccount = () => {
+    localStorage.removeItem("user");
     window.location.reload();
   };
 
-  const TRELLO_KEY = import.meta.env.VITE_TRELLO_KEY;
-  const RETURN_URL = window.location.origin;
-
-  const conectarTrello = useCallback(
-    async (token) => {
-      try {
-        setLoading(true);
-        setErro("");
-
-        const response = await fetch(`${BASE_URL}/users/connect-trello`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            userId: systemUser.uid,
-            token
-          })
-        });
-
-        const data = await response.json();
-
-        if (!data.success) {
-          throw new Error(data.error);
-        }
-
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        window.history.replaceState(
-          {},
-          document.title,
-          window.location.pathname
-        );
-
-        onConnected(data.user);
-      } catch (err) {
-        console.error(err);
-        setErro("Erro ao conectar Trello");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [systemUser, onConnected]
-  );
-
-  useEffect(() => {
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.replace("#", ""));
-    const token = params.get("token");
-    if (token) {
-      conectarTrello(token);
-    }
-  }, [conectarTrello]);
-
-  const handleTrelloAuth = () => {
-    const authUrl =
-      `https://trello.com/1/authorize?` +
-      `expiration=never&` +
-      `name=ProjectMinds&` +
-      `scope=read,write&` +
-      `response_type=token&` +
-      `key=${TRELLO_KEY}&` +
-      `return_url=${RETURN_URL}`;
-
-    window.location.href = authUrl;
-  };
-
   return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white p-6 overflow-hidden">
-      <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 w-full max-w-sm shadow-2xl">
+    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white p-6 overflow-hidden">
+      <div className="w-full max-w-[420px] bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl">
 
-        <div className="flex justify-center mb-4">
-          <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-5xl">
+        <div className="flex justify-center mb-5">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center text-3xl shadow-lg">
             🔗
           </div>
         </div>
 
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-3">Conectar Trello</h1>
-          <p className="text-slate-400 leading-relaxed">
-            Integre sua conta Trello para acessar boards, métricas Scrum/Kanban
-            e análises inteligentes.
-          </p>
-        </div>
+        <h1 className="text-2xl font-bold text-center text-white mb-2">
+          Conectar Trello
+        </h1>
+        <p className="text-slate-400 text-sm text-center mb-6">
+          Integre sua conta Trello para acessar boards, métricas Scrum/Kanban e análises inteligentes.
+        </p>
 
-        <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-4 mb-6">
-          <div className="flex items-center justify-between">
+        {systemUser && (
+          <div className="flex items-center justify-between bg-slate-800/60 border border-slate-700 rounded-xl px-4 py-3 mb-4">
             <div>
-              <p className="text-sm text-slate-400">Usuário conectado</p>
-              <h2 className="font-medium">{systemUser?.nome}</h2>
+              <p className="text-xs text-slate-400">Usuário conectado</p>
+              <p className="text-white font-semibold">{systemUser.nome}</p>
             </div>
-            {systemUser?.photo && (
-              <img
-                src={systemUser.photo}
-                alt="Usuário"
-                className="w-12 h-12 rounded-full border border-slate-700"
-              />
-            )}
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-sm">
+              {systemUser.nome?.[0]?.toUpperCase()}
+            </div>
           </div>
-        </div>
+        )}
 
         {erro && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl p-3 mb-4">
-            {erro}
+          <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+            <p className="text-red-300 text-sm">{erro}</p>
           </div>
         )}
 
         <button
-          onClick={handleTrelloAuth}
+          onClick={handleConnect}
           disabled={loading}
-          className="w-full bg-blue-500 hover:bg-blue-600 transition-all duration-300 px-4 py-3 rounded-2xl font-semibold text-lg shadow-lg disabled:opacity-50"
+          className="w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-50 px-4 py-3 rounded-xl text-white font-semibold mb-3 transition-all"
         >
           {loading ? "Conectando..." : "Conectar com Trello"}
         </button>
 
         <button
-          onClick={handleBackToLogin}
-          className="mt-4 w-full border border-slate-700 hover:border-blue-500 hover:bg-slate-800 transition-all duration-300 px-4 py-3 rounded-2xl font-medium text-slate-300"
+          onClick={handleOtherAccount}
+          disabled={loading}
+          className="w-full bg-transparent border border-slate-700 hover:bg-slate-800 disabled:opacity-50 px-4 py-3 rounded-xl text-white font-medium mb-3 transition-all"
         >
           Conectar outra conta
         </button>
 
+
         <button
-          onClick={handleBackToLogin}
-          className="mt-4 w-full border border-slate-700 hover:border-red-500 hover:bg-slate-800 transition-all duration-300 px-4 py-3 rounded-2xl font-medium text-slate-300"
+          onClick={() => {
+            localStorage.removeItem("user");
+            window.location.reload();
+          }}
+          className="w-full text-slate-400 hover:text-white text-sm py-2 transition-all"
         >
           ← Voltar para Login
         </button>
 
-        <p className="text-xs text-slate-500 text-center mt-5 leading-relaxed">
+        <p className="text-xs text-slate-500 text-center mt-4">
           Ao continuar, você autoriza o Project Minds a acessar seus boards do Trello.
         </p>
+
       </div>
     </div>
   );
