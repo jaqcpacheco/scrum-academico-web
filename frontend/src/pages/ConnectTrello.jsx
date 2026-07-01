@@ -85,8 +85,8 @@ export default function ConnectTrello({ systemUser, onConnected }) {
       <div className="h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white p-6 overflow-hidden">
       <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 w-full max-w-sm shadow-2xl">
 
-        <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-5xl">
+        <div className="flex justify-center mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-5xl">
             🔗
           </div>
         </div>
